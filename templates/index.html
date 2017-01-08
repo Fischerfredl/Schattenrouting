@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Schattenrouting</title>
+    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <script src="/static/js/moment.min.js"></script>
+    {{ mymap.js }}
+</head>
+<body>
+
+    {{ mymap.html }}
+
+    <div id="navigation">
+        <h1>Schatten-Routing</h1>
+        <div id="toggles">
+            <form name =toggles" action ="/" method="POST">
+                <input type="submit" name="toggle_rect" value="Toggle Rectangle">
+                <input type="submit" name="toggle_bldg" value="Toggle Buildings">
+                <input type="submit" name="toggle_routes" value="Toggle Graph">
+                <input type="submit" name="toggle_nds" value="Toggle Nodes">
+                <input type="submit" name="toggle_shortest" value="Toggle Shortest Path">
+            </form>
+        </div>
+        <div id="coords">
+            <h2>Coordinates</h2>
+            <form name="set_coords" action="/" method="POST">
+                <table width="100%">
+                    <tr>
+                        <td class="table_left">From</td>
+                        <td class="table_right"><input type="text" name="set_coords_start" value="{{ session['start'][0] }},{{ session['start'][1] }}"></td>
+                    </tr>
+                    <tr>
+                        <td class="table_left">To</td>
+                        <td class="table_right"><input type="text" name="set_coords_end" value="{{ session['end'][0] }},{{ session['end'][1] }}"></td>
+                    </tr>
+                </table>
+                <input type="submit" name="set_coords" value="Set Coordinates">
+            </form>
+        </div>
+        <div id="date">
+            <h2>Date</h2>
+            <form name="set_date" action="/" method="POST">
+                <table width="100%">
+                    <tr>
+                        <td class="table_left">Date</td>
+                        <td class="table_right">Time (UTC)</td>
+                    </tr>
+                    <tr>
+                        <td class="table_left"><input type="date" name="set_date" value="Set Date"></td>
+                        <td class="table_right"><input type="time" name="set_time" value="Set Time"></td>
+                    </tr>
+                </table>
+                <input type="submit" name="set_date" value="Set Date">
+            </form>
+        </div>
+        <div id="info">
+            <h2>Info</h2>
+            <table width="100%">
+                <tr>
+                    <td class="table_left">From:</td>
+                    <td class="table_right">({{ session['start'][0] }},{{ session['start'][1] }})</td>
+                </tr>
+                <tr>
+                    <td class="table_left">To:</td>
+                    <td class="table_right">({{ session['end'][0] }},{{ session['end'][1] }})</td>
+                </tr>
+                <tr>
+                    <td class="table_left">Date:</td>
+                    <td class="table_right">{{ momentjs(session['date']).format('DD.mm.Y - HH:MM') }}</td>
+                </tr>
+
+            </table>
+        </div>
+        <div id="footer">Made by Alfred Melch</div>
+    </div>
+</body>
+</html>
