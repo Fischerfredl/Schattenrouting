@@ -48,13 +48,11 @@
                         <td class="table_right">Time</td>
                     </tr>
                     <tr>
-                        <td class="table_left"><input id="input_date" type="date" name="input_date"></td>
-                        <td class="table_right"><input id="input_time" type="time" name="input_time"></td>
+                        <td class="table_left"><input id="input_date" type="date" name="input_date" value="{{ session['date'].strftime('%Y-%m-%d') }}"></td>
+                        <td class="table_right"><input id="input_time" type="time" name="input_time" value="{{ session['date'].strftime('%H:%M') }}"></td>
                     </tr>
                 </table>
                 <input type="submit" name="set_date" value="Set Date">
-                {{ momentjs(session['date']).script_set_date_value() }}
-                {{ momentjs(session['date']).script_set_time_value() }}
             </form>
         </div>
         <div id="info">
@@ -70,7 +68,7 @@
                 </tr>
                 <tr>
                     <td class="table_left">Date:</td>
-                    <td class="table_right">{{ momentjs(session['date']).format('DD.MM.YYYY - hh:mm') }}</td>
+                    <td class="table_right">{{ session['date'].strftime('%d.%m.%Y - %H:%M') }}</td>
                 </tr>
 
             </table>

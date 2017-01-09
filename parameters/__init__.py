@@ -1,7 +1,7 @@
 from datetime import datetime
 from flask import session, request
 from queries import get_bounds
-from geocoding import geolocate_coords, geolocate_query
+from geocoding import geolocate_coords, geolocate_query, get_timezone
 from geopy.exc import GeopyError
 from format_data import check_parameter, format_time
 
@@ -25,7 +25,7 @@ def init():
         if not key in session:
             session[key] = params[key]
 
-    session['date'] = datetime.utcnow()
+    session['date'] = datetime.now(get_timezone(session['start'])).replace(tzinfo=None)
 
     process_args()
 

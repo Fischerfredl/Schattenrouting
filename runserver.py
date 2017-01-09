@@ -1,14 +1,12 @@
 from flask import Flask, render_template, request
 from flask_googlemaps import GoogleMaps
 from config import set_config
-from external.momentjs import momentjs
 from parameters import init, process_post
 from visualization import build_map
 
 app = Flask(__name__)
 set_config(app)
 GoogleMaps(app)
-app.jinja_env.globals['momentjs'] = momentjs
 
 
 @app.route('/', methods=['GET', 'POST'])
