@@ -15,6 +15,8 @@ def linebreak():
 
 
 def parse_to_database():
+    if os.path.exists(config['DATABASE']):
+        return True
     print 'Start parsing data into database'
     linebreak()
 

@@ -20,6 +20,7 @@
                 <input type="submit" name="toggle_routes" value="Toggle Graph">
                 <input type="submit" name="toggle_nds" value="Toggle Nodes">
                 <input type="submit" name="toggle_shortest" value="Toggle Shortest Path">
+                <input type="submit" name="toggle_shadiest" value="Toggle Shadiest Path">
             </form>
         </div>
         <div id="coords">
@@ -44,14 +45,16 @@
                 <table width="100%">
                     <tr>
                         <td class="table_left">Date</td>
-                        <td class="table_right">Time (UTC)</td>
+                        <td class="table_right">Time</td>
                     </tr>
                     <tr>
-                        <td class="table_left"><input type="date" name="set_date" value="Set Date"></td>
-                        <td class="table_right"><input type="time" name="set_time" value="Set Time"></td>
+                        <td class="table_left"><input id="input_date" type="date" name="input_date"></td>
+                        <td class="table_right"><input id="input_time" type="time" name="input_time"></td>
                     </tr>
                 </table>
                 <input type="submit" name="set_date" value="Set Date">
+                {{ momentjs(session['date']).script_set_date_value() }}
+                {{ momentjs(session['date']).script_set_time_value() }}
             </form>
         </div>
         <div id="info">
@@ -59,20 +62,20 @@
             <table width="100%">
                 <tr>
                     <td class="table_left">From:</td>
-                    <td class="table_right">({{ session['start'][0] }},{{ session['start'][1] }})</td>
+                    <td class="table_right">{{ session['start_addr'] }}</td>
                 </tr>
                 <tr>
                     <td class="table_left">To:</td>
-                    <td class="table_right">({{ session['end'][0] }},{{ session['end'][1] }})</td>
+                    <td class="table_right">{{ session['end_addr'] }}</td>
                 </tr>
                 <tr>
                     <td class="table_left">Date:</td>
-                    <td class="table_right">{{ momentjs(session['date']).format('DD.mm.Y - HH:MM') }}</td>
+                    <td class="table_right">{{ momentjs(session['date']).format('DD.MM.YYYY - hh:mm') }}</td>
                 </tr>
 
             </table>
         </div>
-        <div id="footer">Made by Alfred Melch</div>
+        <div id="footer">Made by Alfred Melch | <a href="https://github.com/Fischerfredl/Schattenrouting" target="_blank">Source-Code</a></div>
     </div>
 </body>
 </html>

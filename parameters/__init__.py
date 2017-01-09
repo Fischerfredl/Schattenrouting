@@ -1,76 +1,59 @@
 from datetime import datetime
-from flask import session, flash, request
-from config import config
+from flask import session, request
 from queries import get_bounds
-
-
-def set_coords(what, coord_str):
-    try:
-        lat, lon = coord_str.split(',')
-        f_lat = float(lat)
-        f_lon = float(lon)
-        bounds = config['bounds']
-        out_of_scope = 0
-        if f_lat < bounds['south']:
-            out_of_scope = 1
-            f_lat = bounds['south']
-        if f_lat > bounds['north']:
-            out_of_scope = 1
-            f_lat = bounds['south']
-        if f_lon < bounds['west']:
-            out_of_scope = 1
-            f_lon = bounds['west']
-        if f_lon > bounds['east']:
-            out_of_scope = 1
-            f_lon = bounds['east']
-        session[what] = (f_lat, f_lon)
-        if out_of_scope == 1:
-            flash(what+'-Coordinates were out of scope')
-    except ValueError as e:
-        print what+'-Koordinaten konnten nicht gelesen werden'
-        print e.message
-    return
-
-
-def set_date(date_str):
-    try:
-        session['date'] = datetime.strptime(date_str, '%Y.%m.%d-%H:%M')
-    except ValueError as e:
-        print 'Datum konnte nicht gesetzt werden'
-        print e.message
-    return
+from geocoding import geolocate_coords, geolocate_query
+from geopy.exc import GeopyError
+from format_data import check_parameter, format_time
 
 
 def init():
     params = {
-        'start': config['DEFAULT_START'],
-        'end': config['DEFAULT_END'],
-        'date': datetime.utcnow(),
-        'rect': False,
+        'start': (48.3645044, 10.8891771),
+        'end': (48.3709503, 10.9091661),
+        'start_addr': '',
+        'end_addr': '',
+        'date': None,
+        'rect': True,
         'bldg': False,
         'routes': False,
         'nds': False,
-        'shortest': False
+        'shortest': True,
+        'shadiest': False,
+        'bounds': get_bounds()
     }
     for key in params:
-        if not session.get(key):
+        if not key in session:
             session[key] = params[key]
 
-    config['date'] = datetime.utcnow()
+    session['date'] = datetime.utcnow()
 
-    if not config.get('bounds'):
-        config['bounds'] = get_bounds()
+    process_args()
 
+    try:
+        session['start_addr'] = geolocate_coords(session['start'])
+        session['end_addr'] = geolocate_coords(session['end'])
+    except GeopyError as e:
+        print 'Something went wrong on geocoding coordinates'
+        print e.message
+    return
+
+
+def process_args():
     start = request.args.get('start', None)
     end = request.args.get('end', None)
-    date = request.args.get('date', None)
 
     if start:
-        set_coords('start', start)
+        try:
+            session['start'] = check_parameter(start)
+        except ValueError as e:
+            print 'URL parameter start-coordinates could not be read'
+            print e.message
     if end:
-        set_coords('end', end)
-    if date:
-        set_date(date)
+        try:
+            session['end'] = check_parameter(end)
+        except ValueError as e:
+            print 'URL parameter end-coordinates could not be read'
+            print e.message
     return
 
 
@@ -85,6 +68,31 @@ def process_post():
         session['nds'] = not session['nds']
     if 'toggle_shortest' in request.form:
         session['shortest'] = not session['shortest']
+    if 'toggle_shadiest' in request.form:
+        session['shadiest'] = not session['shadiest']
     if request.form.get('set_coords'):
-        set_coords('start', request.form['set_coords_start'])
-        set_coords('end', request.form['set_coords_end'])
+        start = request.form['set_coords_start']
+        end = request.form['set_coords_end']
+        try:
+            session['start'] = check_parameter(start)
+        except ValueError:
+            try:
+                session['start'] = geolocate_query(start)
+            except GeopyError as e:
+                print 'Input start-coordinates could not be read'
+                print e
+        try:
+            session['end'] = check_parameter(end)
+        except ValueError:
+            try:
+                session['end'] = geolocate_query(end)
+            except GeopyError as e:
+                print 'Input end-coordinates could not be read'
+                print e.message
+    if request.form.get('set_date'):
+        try:
+            session['date'] = format_time(request.form['input_date'], request.form['input_time'])
+        except ValueError as e:
+            print 'Input date could not be read'
+            print e.message
+    return

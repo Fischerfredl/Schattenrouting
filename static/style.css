@@ -9,6 +9,18 @@ body {
     margin: 0;
 }
 
+a:link {
+    color: white;
+}
+
+a:visited {
+    color: white;
+}
+
+a:hover {
+    color: #d64735;
+}
+
 #map {
     float: left;
     height: 100%;
@@ -42,13 +54,13 @@ body {
     font-size: 1.7em;
     text-shadow: 0 0 40px white;
     box-shadow: 0 7px 5px -5px white;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 20px;
 }
 
 #toggles {
     margin-top: 20px;
-    margin-bottom: 40px;
+    margin-bottom: 25px;
     padding-top: 10px;
     padding-bottom: 10px;
     box-shadow: 0 0 40px white;
@@ -99,6 +111,7 @@ table, td {
 
 .table_left {
     text-align: left;
+    width:auto;
 }
 .table_right {
     text-align: right;

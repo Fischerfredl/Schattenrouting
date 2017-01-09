@@ -2,26 +2,19 @@ Schattenrouting
 App zur Berechnung der Schattigsten Route zwischen zwei Punkten
 
 Packages:
-config              Contains Configuration for the Server such as default values or Database Location
+config              Contains Configuration for the Server such as Database Location
 data                Extract Raw Data from Openstreetmap(OSM) or KML-File and parse into database
 external            External python packages. (Dijkstra, Priodict, Momentjs)
 parameters          Maintains session wide parameters. Updates on every request. Handles data formats
 queries             Functions to retrieve data from database
-shadow_weighting    Calculations for returning a shadow-weighted graph for routing
 visualization       Creates Map and Map Objects (Bounds-Rectangle, Graph-Polylines, Buildings-Polygons, Markers und Routes)
 
 
-On start of the server via runserver.py, the raw data from OSM and from the KML file in "Datasource" gets parsed and written to the database.
-OSM-data is fetched from the internet. Processing may take several minutes (8 minutes on my machine). KML-data-file is required.
-While parsing a new file will be written in Datasource: 'output.osm' contains the reduced amount of osm-data and will be used dor faster parsing on next server start. Delete this file for data refresh.
-
-When running, the server is accessible through any internet browser locally on the machine by URL-request: 127.0.0.1:5000
-If you want to access the server network-wide change the IP-Adress in config/__init__.py to your local IP-Adress.
-
 Dependencies:
+python 2.7
 flask
 flask-googlemaps
-geopy <soon>
+geopy
 
 The Website/Webapp contains a Map provided by Google Maps.
 You can Toggle different Map-Objects.
@@ -35,15 +28,11 @@ ToDo: -Shadiest Path: Shows the shadiest path between start- and end-node
 Warning: Graph, Buildings and Nodes have heavy influence on loading times. Showing all at once may take a few seconds to load. Operability is slightly influenced. (Only tested on my machine locally)
 Warning: Graph, Buildings and Nodes have severe influence on loading times and operapility on mobile phone. (Only tested on my mobile phone in local network)
 
-Coordinates:
-Coordinates can be set by entering latitude and longitude seperated by komma(,) for start- and end node. It is recommended to use nodes for setting the waypoints.
+Coordinates can be set by entering any kind of Address in the Coordinates-Fields. The Address will be geocoded.
 The coordinates are automatically transferred into the bounds-rectangle if the user provided coordinates out of bounds.
-ToDo: Geocode Addresses filled in Coordinate fields
 ToDo: Mobile: set start by GPS-Module
 
-Date:
-Please note that the serevr uses UTC-Time for calculating the solar position. So the input fields for Time should be filled by UTC-Time.
-The time shown in the "Info"-Field below is your local time since your browser knows your time-zone and can convert the time accordingly
-ToDo: Date functionallity not implemented by now
+The date which is used for calculation of the shadiest route will be reset to present time every refresh.
+When a different date is set it will only be used for the next request.
 
 
