@@ -1,15 +1,15 @@
 from flask_googlemaps import Map
 from flask import session
-from map_objects import rectangle, bldg, routes, nds, shortest, shadiest
+from map_objects import rectangle, bldg, routes, nds, shortest, shadiest, shadow_map
 
 
 def build_map():
     markers = [(session.get('start')[0], session.get('start')[1], '<b>Start:</b><br>'+session['start_addr']),
                (session.get('end')[0], session.get('end')[1], '<b>Ziel:</b><br>'+session['end_addr'])]
-    rectangles = None
+    rectangles = []
     if session.get('rect'):
         rectangles = [rectangle()]
-    polygons = None
+    polygons = []
     if session.get('bldg'):
         polygons = bldg()
     polylines = []
@@ -21,6 +21,7 @@ def build_map():
         polylines.append(shortest())
     if session.get('shadiest'):
         polylines.append(shadiest())
+    polygons.extend(shadow_map())
     return Map(
         identifier="map",
         lat=session.get('start')[0],

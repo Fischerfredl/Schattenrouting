@@ -3,6 +3,7 @@ from data.kml_coordinates import coords_to_array
 from queries import get_nodes, get_graph, get_buildings
 from external.dijkstra import shortestPath
 from find_node import find_node
+from shadow_weighting.shadow_polygons import get_shadow_polygons
 
 
 def rectangle():
@@ -28,15 +29,12 @@ def routes():
     polylines = []
     for start_id in graph:
         for end_id in graph[start_id]:
-            start = nodes[start_id]
-            end = nodes[end_id]
-            polyline = {
+            polylines.append({
                 'stroke_color': '#EF301F',
                 'stroke_opacity': 0.9,
                 'stroke_weight': 1,
-                'path': [start, end]
-            }
-            polylines.append(polyline)
+                'path': [nodes[start_id], nodes[end_id]]
+            })
     return polylines
 
 
@@ -69,16 +67,14 @@ def shortest():
 def bldg():
     polygons = []
     for building in get_buildings():
-        coords = coords_to_array(building[5])
-        polygon = {
+        polygons.append({
             'stroke_color': '#00603F',
             'stroke_opacity': 0.7,
             'stroke_weight': 1,
             'fill_color': '#53c49d',
             'fill_opacity': .5,
-            'path': coords
-        }
-        polygons.append(polygon)
+            'path': coords_to_array(building[5])
+        })
     return polygons
 
 
@@ -88,13 +84,25 @@ def nds():
     for node in nodes:
         lat = nodes[node][0]
         lon = nodes[node][1]
-        marker = {
+        markers.append({
             'icon': url_for('static', filename='icons/node8.png'),
             'lat': lat,
             'lng': lon,
             'infobox': '('+str(lat)+','+str(lon)+')'
                        '<a href="'+url_for('index', start=str(lat)+','+str(lon))+'">Route from here</a><br>'
                        '<a href="'+url_for('index', end=str(lat)+','+str(lon))+'">Route to here</a>'
-        }
-        markers.append(marker)
+        })
     return markers
+
+
+def shadow_map():
+    polygons = []
+    for polygon in get_shadow_polygons():
+        polygons.append({'stroke_color': '#000000',
+                         'stroke_opacity': 0.3,
+                         'stroke_weight': 1,
+                         'fill_color': '#000000',
+                         'fill_opacity': .3,
+                         'path': polygon
+                         })
+    return polygons
