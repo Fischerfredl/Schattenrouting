@@ -1,13 +1,19 @@
 from flask import session, url_for
-from data.kml_coordinates import coords_to_array
-from queries import get_nodes, get_graph, get_buildings
 from external.dijkstra import shortestPath
 from find_node import find_node
-from shadow_weighting.shadow_polygons import get_shadow_polygons
+from queries import get_nodes, get_graph, get_buildings, get_shadow, get_bounds
+
+
+def coords_to_array(coords):
+    coord_array = []
+    for c in coords.strip().split(';'):
+        x, y = c.split(',')
+        coord_array.append((float(x), float(y)))
+    return coord_array
 
 
 def rectangle():
-    bounds = session['bounds']
+    bounds = get_bounds()
     return {
         'stroke_color': '#00603F',
         'stroke_opacity': 1.,
@@ -97,7 +103,7 @@ def nds():
 
 def shadow_map():
     polygons = []
-    for polygon in get_shadow_polygons():
+    for polygon in get_shadow():
         polygons.append({'stroke_color': '#000000',
                          'stroke_opacity': 0.3,
                          'stroke_weight': 1,

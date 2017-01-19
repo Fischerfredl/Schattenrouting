@@ -22,7 +22,7 @@ def init():
         'bounds': get_bounds()
     }
     for key in params:
-        if not key in session:
+        if key not in session:
             session[key] = params[key]
 
     session['date'] = datetime.now(get_timezone(session['start'])).replace(tzinfo=None)

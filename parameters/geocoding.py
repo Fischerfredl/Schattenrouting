@@ -1,8 +1,6 @@
 from geopy.exc import GeopyError
 from geopy.geocoders import Nominatim, GoogleV3
 from format_data import get_in_bounds
-from flask import session
-from datetime import datetime
 
 
 def geolocate_query(query):

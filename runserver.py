@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, session
 from flask_googlemaps import GoogleMaps
 from config import set_config
 from parameters import init, process_post

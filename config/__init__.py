@@ -18,9 +18,13 @@ config = {
     'GOOGLEMAPS_KEY': 'AIzaSyDdSwma5Rv0hPcgHwPCzy59WbHIgJSZIMg',
     'SECRET_KEY': get_secret_key(),
     'DATABASE': os.path.abspath('Database/database.db'),
-    'OSM_INPUT': os.path.abspath('Datasource/map.osm'),
-    'OSM_OUTPUT': os.path.abspath('Datasource/output.osm'),
-    'KML_Input': os.path.abspath('Datasource/Augsburg.kml'),
     'IPADDR': '0.0.0.0',
     'PORT': 5000
+}
+
+bounds = {
+    'west': 10.877044240271672,
+    'east': 10.915640681173187,
+    'north': 48.381499267422946,
+    'south': 48.35354955784755
 }
