@@ -3,17 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Schattenrouting</title>
-    <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" type=text/css href="/static/style.css">
     <script src="/static/js/moment.min.js"></script>
     <script src="/static/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }}</script>
-
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdSwma5Rv0hPcgHwPCzy59WbHIgJSZIMg&callback=initialize">
-    </script>
     <script src="/static/js/mymapscript.js"></script>
-
-
 </head>
 <body>
 
@@ -90,5 +84,8 @@
         </div>
         <div id="footer">Made by Alfred Melch | <a href="https://github.com/Fischerfredl/Schattenrouting" target="_blank">Source-Code</a></div>
     </div>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdSwma5Rv0hPcgHwPCzy59WbHIgJSZIMg&callback=initialize">
+    </script>
 </body>
 </html>

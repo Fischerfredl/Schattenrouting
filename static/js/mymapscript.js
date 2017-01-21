@@ -382,7 +382,7 @@ function initialize() {
     function load_graph() {
         for (var j = 0; j < graph.length; j++) graph[j].setMap(null);
         $.getJSON($SCRIPT_ROOT + '/api/get_graph', {date: date, time: time}, function (data) {
-            blockListeners();
+            document.getElementById("toggle_routes").disabled = true;
             for (var i = 0; i < data.length; i++) {
                 //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 graph[i] = new google.maps.Polyline({
@@ -394,7 +394,8 @@ function initialize() {
                     geodesic: true
                 });
             }
-            setListener();
+            document.getElementById("toggle_routes").disabled = false;
+
         });
     }
 
