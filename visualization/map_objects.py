@@ -1,7 +1,6 @@
 from flask import session, url_for
 from external.dijkstra import shortestPath
-from find_node import find_node
-from queries import get_nodes, get_graph, get_buildings, get_shadow, get_bounds
+from queries import get_nodes, get_buildings, get_shadow, get_bounds
 
 
 def coords_to_array(coords):

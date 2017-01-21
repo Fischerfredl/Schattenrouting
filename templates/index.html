@@ -5,26 +5,34 @@
     <title>Schattenrouting</title>
     <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
     <script src="/static/js/moment.min.js"></script>
-    {{ mymap.js }}
+    <script src="/static/js/progressBar.js"></script>
+    <script src="/static/js/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }}</script>
+
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdSwma5Rv0hPcgHwPCzy59WbHIgJSZIMg&callback=initialize">
+    </script>
+
+    <script src="/static/js/mymapscript.js"></script>
+
 </head>
 <body>
 
-    {{ mymap.html }}
+    <div id="map"></div>
 
     <div id="navigation">
         <h1>Schatten-Routing</h1>
         <div id="toggles">
-            <form name =toggles" action ="/" method="POST">
-                <input type="submit" name="toggle_rect" value="Toggle Rectangle">
-                <input type="submit" name="toggle_bldg" value="Toggle Buildings">
-                <input type="submit" name="toggle_routes" value="Toggle Graph">
-                <input type="submit" name="toggle_nds" value="Toggle Nodes">
-                <input type="submit" name="toggle_shortest" value="Toggle Shortest Path">
-                <input type="submit" name="toggle_shadiest" value="Toggle Shadiest Path">
-            </form>
+            <button type="button" id="toggle_shortest">Toggle Shortest Path</button>
+            <button type="button" id="toggle_shadiest">Toggle Shadiest Path</button>
+            <button type="button" id="toggle_sunniest">Toggle Sunniest Path</button>
+            <button type="button" id="toggle_bldg">Toggle Buildings</button>
+            <button type="button" id="toggle_shadows">Toggle Shadows</button>
+            <button type="button" id="toggle_routes">Toggle Graph</button>
+
         </div>
         <div id="coords">
-            <h2>Coordinates</h2>
+            <h2>Navigation</h2>
             <form name="set_coords" action="/" method="POST">
                 <table width="100%">
                     <tr>
@@ -36,7 +44,7 @@
                         <td class="table_right"><input type="text" name="set_coords_end" value="{{ session['end'][0] }},{{ session['end'][1] }}"></td>
                     </tr>
                 </table>
-                <input type="submit" name="set_coords" value="Set Coordinates">
+                <button type="button" id="set_coords">Calculate Route</button>
             </form>
         </div>
         <div id="date">
@@ -48,11 +56,11 @@
                         <td class="table_right">Time</td>
                     </tr>
                     <tr>
-                        <td class="table_left"><input id="input_date" type="date" name="input_date" value="{{ session['date'].strftime('%Y-%m-%d') }}"></td>
-                        <td class="table_right"><input id="input_time" type="time" name="input_time" value="{{ session['date'].strftime('%H:%M') }}"></td>
+                        <td class="table_left"><input id="input_date" type="date" name="input_date"></td>
+                        <td class="table_right"><input id="input_time" type="time" name="input_time"></td>
                     </tr>
                 </table>
-                <input type="submit" name="set_date" value="Set Date">
+                <button type="button" id="set_date">Set Date</button>
             </form>
         </div>
         <div id="info">
