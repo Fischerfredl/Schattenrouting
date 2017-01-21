@@ -6,7 +6,7 @@ from external.dijkstra import shortestPath
 # Query database -------------------------------------------------------------------------------------------------------
 
 def query_db(query, args=()):
-    connection = sqlite3.connect('Database/database.db')
+    connection = sqlite3.connect('database.db')
     cur = connection.cursor().execute(query, args)
     return cur.fetchall()
 
