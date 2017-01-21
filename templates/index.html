@@ -5,15 +5,14 @@
     <title>Schattenrouting</title>
     <link rel="stylesheet" type=text/css href="{{ url_for('static', filename='style.css') }}">
     <script src="/static/js/moment.min.js"></script>
-    <script src="/static/js/progressBar.js"></script>
     <script src="/static/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }}</script>
 
     <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDdSwma5Rv0hPcgHwPCzy59WbHIgJSZIMg&callback=initialize">
     </script>
-
     <script src="/static/js/mymapscript.js"></script>
+
 
 </head>
 <body>
@@ -37,11 +36,11 @@
                 <table width="100%">
                     <tr>
                         <td class="table_left">From</td>
-                        <td class="table_right"><input type="text" name="set_coords_start" value="{{ session['start'][0] }},{{ session['start'][1] }}"></td>
+                        <td class="table_right"><input type="text" id="set_coords_start"></td>
                     </tr>
                     <tr>
                         <td class="table_left">To</td>
-                        <td class="table_right"><input type="text" name="set_coords_end" value="{{ session['end'][0] }},{{ session['end'][1] }}"></td>
+                        <td class="table_right"><input type="text" id="set_coords_end"></td>
                     </tr>
                 </table>
                 <button type="button" id="set_coords">Calculate Route</button>
@@ -68,15 +67,23 @@
             <table width="100%">
                 <tr>
                     <td class="table_left">From:</td>
-                    <td class="table_right">{{ session['start_addr'] }}</td>
+                    <td class="table_right" id="start_addr"></td>
                 </tr>
                 <tr>
                     <td class="table_left">To:</td>
-                    <td class="table_right">{{ session['end_addr'] }}</td>
+                    <td class="table_right" id="end_addr"></td>
                 </tr>
                 <tr>
                     <td class="table_left">Date:</td>
-                    <td class="table_right">{{ session['date'].strftime('%d.%m.%Y - %H:%M') }}</td>
+                    <td class="table_right" id="date_label"></td>
+                </tr>
+                <tr>
+                    <td class="table_left">Azimut:</td>
+                    <td class="table_right" id="azimut"></td>
+                </tr>
+                <tr>
+                    <td class="table_left">Elevation:</td>
+                    <td class="table_right" id="elevation"></td>
                 </tr>
 
             </table>

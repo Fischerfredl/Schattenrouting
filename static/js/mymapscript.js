@@ -7,16 +7,10 @@ var rect = null;
 // coordinates
 var start = null;
 var end = null;
-var start_addr = null;
-var end_addr = null;
 
 // date
 var date = null;
 var time = null;
-
-// solar position
-var azimut = null;
-var elevation = null;
 
 // paths
 var shortest = null;
@@ -55,8 +49,9 @@ function initialize() {
     init_date();
     set_solar_position();
     init_rect();
-    load_path();
+    setTimeout(init_path, 100);
     refresh();
+    setListener();
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -64,16 +59,26 @@ function initialize() {
 // ---------------------------------------------------------------------------------------------------------------------
 
     function init_start() {
-        // !!!!!add: get position from device!!!!!
-        //noinspection JSUnresolvedVariable,JSUnresolvedFunction
         start = new google.maps.Marker({
             position: new google.maps.LatLng(48.3645044, 10.8891771),
             map: map,
             label: 'A',
-            draggable: true
+            draggable: false
         });
-        //noinspection JSUnresolvedVariable
-        google.maps.event.addListener(start, 'click', getInfoCallback(map, 'From'));
+        position = locate_device();
+        if (position) start.setPosition = position;
+    }
+
+    function locate_device() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    return google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                },
+                function (msg) {
+                }
+            );
+        }
     }
 
     function init_end() {
@@ -82,7 +87,7 @@ function initialize() {
             position: new google.maps.LatLng(48.3709503, 10.9091661),
             map: map,
             label: 'B',
-            draggable: true
+            draggable: false
         });
         //noinspection JSUnresolvedVariable
         google.maps.event.addListener(end, 'click', getInfoCallback(map, 'To'));
@@ -120,11 +125,22 @@ function initialize() {
     function set_address() {
         $.getJSON(
             $SCRIPT_ROOT + '/api/reverse_geocode',
-            {startlat: start.lat, startlon: start.lng, endlat: end.lat, endlon: end.lng},
+            {lat: start.getPosition().lat(), lon: start.getPosition().lng()},
             function (data) {
-                if (data.start_addr) start_addr = data.start_addr;
-                if (data.end_addr) end_addr = data.end_addr
+                if (data.address) {
+                    document.getElementById("set_coords_start").value = data.address;
+                }
             });
+
+    $.getJSON(
+            $SCRIPT_ROOT + '/api/reverse_geocode',
+            {lat: end.getPosition().lat, lon: end.getPosition().lng},
+            function (data) {
+                if (data.address) {
+                    document.getElementById("set_coords_end").value = data.address;
+                }
+            });
+
     }
 
     function set_solar_position() {
@@ -132,58 +148,64 @@ function initialize() {
             $SCRIPT_ROOT + '/api/get_solar_position',
             {date: date, time: time},
             function (data) {
-                if (data.azimut) azimut = data.azimut;
-                if (data.elevation) elevation = data.elevation
+                document.getElementById("azimut").innerHTML = data.azimut.toFixed(2);
+                document.getElementById("elevation").innerHTML = data.elevation.toFixed(2);
             });
     }
 
     function refresh() {
-        // !!!!!add: update html elements!!!!!
         document.getElementById("input_date").value = date;
         document.getElementById("input_time").value = time;
+        document.getElementById("date_label").innerHTML = date + " " + time;
+        document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
+        document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // data change triggers
 // ---------------------------------------------------------------------------------------------------------------------
 
-
-//noinspection JSUnresolvedVariable
+    //noinspection JSUnresolvedVariable
     google.maps.event.addListener(start, 'dragend', function () {
-        set_address();
-        load_path();
-        refresh();
-    });
+            set_address();
+            load_path();
+            document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
+            document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
+        });
 
-//noinspection JSUnresolvedVariable
-    google.maps.event.addListener(end, 'dragend', function () {
-        set_address();
-        load_path();
-        refresh();
-    });
+    //noinspection JSUnresolvedVariable
+        google.maps.event.addListener(end, 'dragend', function () {
+            set_address();
+            load_path();
+            document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
+            document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
+        });
 
     function set_location() {
         $.getJSON(
             $SCRIPT_ROOT + '/api/geocode',
-            {start: document.getElementById('set_coords_start').value, end: document.getElementById('set_coords_end')},
+            {start_str: document.getElementById('set_coords_start').value, end_str: document.getElementById('set_coords_end').value},
             function (data) {
                 if (data.start) {
                     start.lat = data.start[0];
                     start.lng = data.start[1];
+                    document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
+
                 }
                 if (data.end) {
                     end.lat = data.end[0];
                     end.lng = data.end[1];
+                    document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
                 }
+
             });
-        set_address();
         load_path();
-        refresh();
     }
 
     function set_date() {
-        date = document.getElementById('input_date').value;
-        time = document.getElementById('input_time').value;
+;
+        if (document.getElementById('input_date').value) date = document.getElementById('input_date').value;
+        if (document.getElementById('input_time').value) time = document.getElementById('input_time').value;
         if (bldg.length != 0) {
             if (bldg[0].map != null) load_buildings();
             else bldg = [];
@@ -197,6 +219,8 @@ function initialize() {
             else graph = [];
         }
         load_path();
+        set_solar_position();
+        refresh();
     }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -241,12 +265,7 @@ function initialize() {
 // load data
 // ---------------------------------------------------------------------------------------------------------------------
 
-    function load_path() {
-        if (shortest != null) shortest.setMap(null);
-        if (shadiest != null) shadiest.setMap(null);
-        if (sunniest != null) sunniest.setMap(null);
-
-        // shortest
+    function init_path() {
         $.getJSON(
             $SCRIPT_ROOT + '/api/get_path',
             {
@@ -256,43 +275,43 @@ function initialize() {
                 startlon: start.getPosition().lng(),
                 endlat: end.getPosition().lat(),
                 endlon: end.getPosition().lng(),
-                pathtype: "shortest"
             },
             function (data) {
-                //noinspection JSUnresolvedVariable,JSUnresolvedFunction
+                document.getElementById("toggle_shortest").disabled = true;
+                start.setDraggable(false);
+                end.setDraggable(false);
                 shortest = new google.maps.Polyline({
                     strokeColor: '#00B3FD',
                     strokeOpacity: 0.9,
                     strokeWeight: 5,
-                    path: data,
+                    path: data.shortest,
                     map: null,
                     geodesic: true
                 });
-            });
-        // shadiest
-        $.getJSON(
-            $SCRIPT_ROOT + '/api/get_path',
-            {
-                date: date,
-                time: time,
-                startlat: start.getPosition().lat(),
-                startlon: start.getPosition().lng(),
-                endlat: end.getPosition().lat(),
-                endlon: end.getPosition().lng(),
-                pathtype: "shadiest"
-            },
-            function (data) {
-                //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 shadiest = new google.maps.Polyline({
                     strokeColor: '#005071',
                     strokeOpacity: 0.9,
                     strokeWeight: 5,
-                    path: data,
+                    path: data.shadiest,
                     map: map,
                     geodesic: true
                 });
+                sunniest = new google.maps.Polyline({
+                    strokeColor: '#dfd414',
+                    strokeOpacity: 0.9,
+                    strokeWeight: 5,
+                    path: data.sunniest,
+                    map: null,
+                    geodesic: true
+                });
+                start.setDraggable(true);
+                end.setDraggable(true);
+                document.getElementById("toggle_shortest").disabled = false;
             });
-        // sunniest
+    }
+
+
+    function load_path() {
         $.getJSON(
             $SCRIPT_ROOT + '/api/get_path',
             {
@@ -301,25 +320,25 @@ function initialize() {
                 startlat: start.getPosition().lat(),
                 startlon: start.getPosition().lng(),
                 endlat: end.getPosition().lat(),
-                endlon: end.getPosition().lng(),
-                pathtype: "sunniest"
+                endlon: end.getPosition().lng()
             },
             function (data) {
-                //noinspection JSUnresolvedVariable,JSUnresolvedFunction
-                sunniest = new google.maps.Polyline({
-                    strokeColor: '#dfd414',
-                    strokeOpacity: 0.9,
-                    strokeWeight: 5,
-                    path: data,
-                    map: null,
-                    geodesic: true
-                });
+                document.getElementById("toggle_shortest").disabled = true;
+                start.setDraggable(false);
+                end.setDraggable(false);
+                shortest.setPath(data.shortest);
+                shadiest.setPath(data.shadiest);
+                sunniest.setPath(data.sunniest);
+                start.setDraggable(true);
+                end.setDraggable(true);
+                document.getElementById("toggle_shortest").disabled = false;
             });
-
     }
 
     function load_buildings() {
+        for (var j = 0; j < bldg.length; j++) bldg[j].setMap(null);
         $.getJSON($SCRIPT_ROOT + '/api/get_buildings', {}, function (data) {
+            document.getElementById("toggle_bldg").disabled = true;
             for (var i = 0; i < data.length; i++) {
                 //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 bldg[i] = new google.maps.Polygon({
@@ -333,11 +352,14 @@ function initialize() {
                     geodesic: true
                 });
             }
+            document.getElementById("toggle_bldg").disabled = false;
         });
     }
 
     function load_shadows() {
+        for (var j = 0; j < shadows.length; j++) shadows[j].setMap(null);
         $.getJSON($SCRIPT_ROOT + '/api/get_shadows', {date: date, time: time}, function (data) {
+            document.getElementById("toggle_shadows").disabled = true;
             for (var i = 0; i < data.length; i++) {
                 //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 shadows[i] = new google.maps.Polygon({
@@ -351,13 +373,16 @@ function initialize() {
                     geodesic: true
                 });
             }
+            document.getElementById("toggle_shadows").disabled = false;
         });
 
 
     }
 
     function load_graph() {
+        for (var j = 0; j < graph.length; j++) graph[j].setMap(null);
         $.getJSON($SCRIPT_ROOT + '/api/get_graph', {date: date, time: time}, function (data) {
+            blockListeners();
             for (var i = 0; i < data.length; i++) {
                 //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 graph[i] = new google.maps.Polyline({
@@ -369,6 +394,7 @@ function initialize() {
                     geodesic: true
                 });
             }
+            setListener();
         });
     }
 
@@ -392,14 +418,14 @@ function initialize() {
         };
     }
 
-    document.getElementById("toggle_shortest").onclick = toggle_shortest;
-    document.getElementById("toggle_shadiest").onclick = toggle_shadiest;
-    document.getElementById("toggle_sunniest").onclick = toggle_sunniest;
-    document.getElementById("toggle_bldg").onclick = toggle_bldg;
-    document.getElementById("toggle_routes").onclick = toggle_routes;
-    document.getElementById("toggle_shadows").onclick = toggle_shadows;
-
-    document.getElementById("set_coords").onclick = set_location;
-    document.getElementById("set_date").onclick = set_date;
-
+    function setListener() {
+        document.getElementById("toggle_shortest").onclick = toggle_shortest;
+        document.getElementById("toggle_shadiest").onclick = toggle_shadiest;
+        document.getElementById("toggle_sunniest").onclick = toggle_sunniest;
+        document.getElementById("toggle_bldg").onclick = toggle_bldg;
+        document.getElementById("toggle_routes").onclick = toggle_routes;
+        document.getElementById("toggle_shadows").onclick = toggle_shadows;
+        document.getElementById("set_coords").onclick = set_location;
+        document.getElementById("set_date").onclick = set_date;
+    }
 }

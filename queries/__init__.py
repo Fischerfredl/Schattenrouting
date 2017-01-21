@@ -75,6 +75,11 @@ def get_nodes():
     return all_nodes
 
 
+def get_solar_position(date):
+    query = query_db('SELECT Azimut, Elevation FROM Grid WHERE GridID = ?', [get_grid_id(date)])
+    return (query[0][0], query[0][1]) if query else (0, 0)
+
+
 # Getter for JavaScript ------------------------------------------------------------------------------------------------
 
 def get_bounds():
@@ -135,9 +140,9 @@ def get_graph(date, start, end, case):
         node2 = edge[1]
         factor = 1
         if case == 'shadiest':
-            factor = 1 if not weighted else weighted[edge[2]]
+            factor = 1 if not weighted else lin_ab(weighted[edge[2]], 1., 10., 1., 3.)
         elif case == 'sunniest':
-            factor = 1 if not weighted else 10 - weighted[edge[2]]
+            factor = 1 if not weighted else lin_ab(10 - weighted[edge[2]], 1., 10., 1., 2.)
         cost = edge[3] * factor
         if not graph.get(node1):
             graph[node1] = {node2: cost}
