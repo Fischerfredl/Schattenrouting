@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Schattenrouting</title>
     <link rel="stylesheet" type=text/css href="/static/style.css">
-    <link rel="icon" href="static/favicon.ico" type="image/x-icon"/>
+	<link rel="icon" href="static/favicon.ico" type="image/x-icon"/>
     <script src="/static/js/moment.min.js"></script>
     <script src="/static/js/jquery-3.1.1.min.js"></script>
     <script type="text/javascript">$SCRIPT_ROOT = {{ request.script_root|tojson|safe }}</script>
@@ -31,11 +31,15 @@
                 <table width="100%">
                     <tr>
                         <td class="table_left">From</td>
-                        <td class="table_right"><input type="text" id="set_coords_start"></td>
+                        <td class="table_right"><input
+                                onkeydown = "if (event.keyCode == 13)
+                                document.getElementById('set_coords').click()" type="text" id="set_coords_start"></td>
                     </tr>
                     <tr>
                         <td class="table_left">To</td>
-                        <td class="table_right"><input type="text" id="set_coords_end"></td>
+                        <td class="table_right"><input
+                                onkeydown = "if (event.keyCode == 13)
+                                document.getElementById('set_coords').click()" type="text" id="set_coords_end"></td>
                     </tr>
                 </table>
                 <button type="button" id="set_coords">Calculate Route</button>
