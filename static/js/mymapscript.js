@@ -43,15 +43,18 @@ function initialize() {
             fullscreenControl: false
         });
 
+
     init_start();
     init_end();
     set_address();
     init_date();
     set_solar_position();
     init_rect();
+    disable_buttons();
     setTimeout(init_path, 100);
     refresh();
     setListener();
+
 
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -167,55 +170,64 @@ function initialize() {
 
     //noinspection JSUnresolvedVariable
     google.maps.event.addListener(start, 'dragend', function () {
-            set_address();
-            load_path();
-            document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
-            document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
-        });
+        disable_buttons();
+        set_address();
+        load_path();
+        document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
+        document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
+    });
 
     //noinspection JSUnresolvedVariable
-        google.maps.event.addListener(end, 'dragend', function () {
-            set_address();
-            load_path();
-            document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
-            document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
-        });
+    google.maps.event.addListener(end, 'dragend', function () {
+        disable_buttons();
+        set_address();
+        load_path();
+        document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
+        document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
+    });
 
     function set_location() {
+
         $.getJSON(
             $SCRIPT_ROOT + '/api/geocode',
             {start_str: document.getElementById('set_coords_start').value, end_str: document.getElementById('set_coords_end').value},
             function (data) {
+                disable_buttons();
                 if (data.start) {
-                    start.lat = data.start[0];
-                    start.lng = data.start[1];
+                    start.setPosition(new google.maps.LatLng(data.start[0], data.start[1]));
                     document.getElementById("start_addr").innerHTML = "("+start.getPosition().lat().toFixed(5)+","+start.getPosition().lng().toFixed(5)+")";
-
+                }
+                else {
+                    document.getElementById("set_coords_start").value = "[No results] " + document.getElementById("set_coords_start").value;
                 }
                 if (data.end) {
-                    end.lat = data.end[0];
-                    end.lng = data.end[1];
+                    end.setPosition(new google.maps.LatLng(data.end[0], data.end[1]));
                     document.getElementById("end_addr").innerHTML = "("+end.getPosition().lat().toFixed(5)+","+end.getPosition().lng().toFixed(5)+")";
                 }
-
+                else {
+                    document.getElementById("set_coords_end").value = "[No results] " + document.getElementById("set_coords_end").value;
+                }
+                load_path();
             });
-        load_path();
     }
 
     function set_date() {
-;
+        disable_buttons();
         if (document.getElementById('input_date').value) date = document.getElementById('input_date').value;
         if (document.getElementById('input_time').value) time = document.getElementById('input_time').value;
-        if (bldg.length != 0) {
-            if (bldg[0].map != null) load_buildings();
-            else bldg = [];
-        }
+
         if (shadows.length != 0) {
-            if (shadows[0].map != null) load_shadows();
+            if (shadows[0].map != null) {
+                document.getElementById("toggle_shadows").disabled = true;
+                load_shadows();
+            }
             else shadows = [];
         }
         if (graph.length != 0) {
-            if (graph[0].map != null) load_graph();
+            if (graph[0].map != null){
+                document.getElementById("toggle_routes").disabled = true;
+                load_graph();
+            }
             else graph = [];
         }
         load_path();
@@ -229,21 +241,42 @@ function initialize() {
 
 
     function toggle_bldg() {
+        document.getElementById("toggle_bldg").disabled = true;
         if (bldg.length == 0 ) load_buildings();
-        else if (bldg[0].map == null) for (var i in bldg) bldg[i].setMap(map);
-        else for (var j in bldg) bldg[j].setMap(null)
+        else if (bldg[0].map == null) {
+            for (var i in bldg) bldg[i].setMap(map);
+            document.getElementById("toggle_bldg").disabled = false;
+        }
+        else {
+            for (var j in bldg) bldg[j].setMap(null)
+            document.getElementById("toggle_bldg").disabled = false;
+        }
     }
 
     function toggle_routes() {
+        document.getElementById("toggle_routes").disabled = true;
         if (graph.length == 0) load_graph();
-        else if (graph[0].map == null) for (var i in graph) graph[i].setMap(map);
-        else for (var j in graph) graph[j].setMap(null)
+        else if (graph[0].map == null) {
+            for (var i in graph) graph[i].setMap(map);
+            document.getElementById("toggle_routes").disabled = false;
+        }
+        else {
+            for (var j in graph) graph[j].setMap(null)
+            document.getElementById("toggle_routes").disabled = false;
+        }
     }
 
     function toggle_shadows() {
+        document.getElementById("toggle_shadows").disabled = true;
         if (shadows.length == 0) load_shadows();
-        else if (shadows[0].map == null) for (var i in shadows) shadows[i].setMap(map);
-        else for (var j in shadows) shadows[j].setMap(null)
+        else if (shadows[0].map == null) {
+            for (var i in shadows) shadows[i].setMap(map);
+            document.getElementById("toggle_shadows").disabled = false;
+        }
+        else {
+            for (var j in shadows) shadows[j].setMap(null)
+            document.getElementById("toggle_shadows").disabled = false;
+        }
     }
 
     function toggle_shortest() {
@@ -274,12 +307,9 @@ function initialize() {
                 startlat: start.getPosition().lat(),
                 startlon: start.getPosition().lng(),
                 endlat: end.getPosition().lat(),
-                endlon: end.getPosition().lng(),
+                endlon: end.getPosition().lng()
             },
             function (data) {
-                document.getElementById("toggle_shortest").disabled = true;
-                start.setDraggable(false);
-                end.setDraggable(false);
                 shortest = new google.maps.Polyline({
                     strokeColor: '#00B3FD',
                     strokeOpacity: 0.9,
@@ -304,9 +334,7 @@ function initialize() {
                     map: null,
                     geodesic: true
                 });
-                start.setDraggable(true);
-                end.setDraggable(true);
-                document.getElementById("toggle_shortest").disabled = false;
+                enable_buttons()
             });
     }
 
@@ -323,22 +351,16 @@ function initialize() {
                 endlon: end.getPosition().lng()
             },
             function (data) {
-                document.getElementById("toggle_shortest").disabled = true;
-                start.setDraggable(false);
-                end.setDraggable(false);
                 shortest.setPath(data.shortest);
                 shadiest.setPath(data.shadiest);
                 sunniest.setPath(data.sunniest);
-                start.setDraggable(true);
-                end.setDraggable(true);
-                document.getElementById("toggle_shortest").disabled = false;
+                enable_buttons()
             });
     }
 
     function load_buildings() {
         for (var j = 0; j < bldg.length; j++) bldg[j].setMap(null);
         $.getJSON($SCRIPT_ROOT + '/api/get_buildings', {}, function (data) {
-            document.getElementById("toggle_bldg").disabled = true;
             for (var i = 0; i < data.length; i++) {
                 //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 bldg[i] = new google.maps.Polygon({
@@ -359,7 +381,6 @@ function initialize() {
     function load_shadows() {
         for (var j = 0; j < shadows.length; j++) shadows[j].setMap(null);
         $.getJSON($SCRIPT_ROOT + '/api/get_shadows', {date: date, time: time}, function (data) {
-            document.getElementById("toggle_shadows").disabled = true;
             for (var i = 0; i < data.length; i++) {
                 //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 shadows[i] = new google.maps.Polygon({
@@ -382,7 +403,6 @@ function initialize() {
     function load_graph() {
         for (var j = 0; j < graph.length; j++) graph[j].setMap(null);
         $.getJSON($SCRIPT_ROOT + '/api/get_graph', {date: date, time: time}, function (data) {
-            document.getElementById("toggle_routes").disabled = true;
             for (var i = 0; i < data.length; i++) {
                 //noinspection JSUnresolvedVariable,JSUnresolvedFunction
                 graph[i] = new google.maps.Polyline({
@@ -428,5 +448,25 @@ function initialize() {
         document.getElementById("toggle_shadows").onclick = toggle_shadows;
         document.getElementById("set_coords").onclick = set_location;
         document.getElementById("set_date").onclick = set_date;
+    }
+
+    function disable_buttons(){
+        document.getElementById("set_coords").disabled = true;
+        document.getElementById("set_date").disabled = true;
+        document.getElementById("toggle_shortest").disabled = true;
+        document.getElementById("toggle_shadiest").disabled = true;
+        document.getElementById("toggle_sunniest").disabled = true;
+        start.setDraggable(false);
+        end.setDraggable(false);
+    }
+
+    function enable_buttons(){
+        start.setDraggable(true);
+        end.setDraggable(true);
+        document.getElementById("set_date").disabled = false;
+        document.getElementById("set_coords").disabled = false;
+        document.getElementById("toggle_shortest").disabled = false;
+        document.getElementById("toggle_sunniest").disabled = false;
+        document.getElementById("toggle_shadiest").disabled = false;
     }
 }
