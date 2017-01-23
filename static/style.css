@@ -107,6 +107,12 @@ button:focus {
     outline: none;
 }
 
+button[disabled] {
+    background-color: #8a8a8a;
+    box-shadow:inset 0px 34px 0px -15px #ababab;
+    border: 1px solid #ffffff
+}
+
 table, td {
     border-collapse: collapse;
     margin: 5px auto;
