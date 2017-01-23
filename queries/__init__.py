@@ -8,7 +8,7 @@ import os
 
 def query_db(query, args=()):
     database = 'database.db'
-    if os.environ['SCHATTENROUTING_DATABASE'] is not None:
+    if os.environ.get('SCHATTENROUTING_DATABASE', None) is not None:
         database = os.environ['SCHATTENROUTING_DATABASE']
     connection = sqlite3.connect(database)
     cur = connection.cursor().execute(query, args)
