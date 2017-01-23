@@ -1,29 +1,21 @@
-Schattenrouting
+Schattenrouting  
+App zur Berechnung der Schattigsten Route zwischen zwei Punkten.  
+Calculating the shadiest path between two points.  
 
-App zur Berechnung der Schattigsten Route zwischen zwei Punkten.
-Calculating the shadiest path between two points.
 
-
-Dependencies:
-
-python 2.7
-
-flask
-
-geopy
+Dependencies:  
+python 2.7  
+flask  
+geopy  
 
 
 The Website/Webapp contains a Map provided by Google Maps.
 
 
-You can Toggle different Map-Objects:
-
--Buildings: Plots layout of the buildings as Polygons.
-
--Graph: Shows the graph used for routing. Can be used for locating unconnected nodes.
-
--Shadows: Shows the Shadows thrown by buildings
-
+You can Toggle different Map-Objects:  
+-Buildings: Plots layout of the buildings as Polygons.  
+-Graph: Shows the graph used for routing. Can be used for locating unconnected nodes.  
+-Shadows: Shows the Shadows thrown by buildings  
 -Paths: Shows the shortest/shadiest/sunniest Path between start- and end-node
 
 
