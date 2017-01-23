@@ -1,12 +1,16 @@
 import sqlite3
 import numpy as np
 from external.dijkstra import shortestPath
+import os
 
 
 # Query database -------------------------------------------------------------------------------------------------------
 
 def query_db(query, args=()):
-    connection = sqlite3.connect('database.db')
+    database = 'database.db'
+    if os.environ['SCHATTENROUTING_DATABASE'] is not None:
+        database = os.environ['SCHATTENROUTING_DATABASE']
+    connection = sqlite3.connect(database)
     cur = connection.cursor().execute(query, args)
     return cur.fetchall()
 
